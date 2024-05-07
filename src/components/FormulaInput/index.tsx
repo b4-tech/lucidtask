@@ -12,6 +12,7 @@ interface Props {
 }
 
 const FormulaInput: FC<Props> = ({ formulaId }) => {
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const { elements, setElements, editElement } = useStore((state) => ({
     elements: state.elements[formulaId] || [],
     setElements: state.setElements,
@@ -30,6 +31,7 @@ const FormulaInput: FC<Props> = ({ formulaId }) => {
         if (inputValue) {
           addWord(inputValue, false);
         }
+
         addWord(event.key, false);
       } else if (event.key === ' ' && inputValue) {
         event.preventDefault();
@@ -37,11 +39,12 @@ const FormulaInput: FC<Props> = ({ formulaId }) => {
       }
     };
 
-    window.addEventListener('keyup', handleKeyUp);
+    const inputElement = inputRef.current;
+    inputElement?.addEventListener('keyup', handleKeyUp);
     return () => {
-      window.removeEventListener('keyup', handleKeyUp);
+      inputElement?.removeEventListener('keyup', handleKeyUp);
     };
-  }, [inputValue]);
+  }, [inputValue, inputRef]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
@@ -115,6 +118,7 @@ const FormulaInput: FC<Props> = ({ formulaId }) => {
             </span>
           ))}
           <input
+            ref={inputRef}
             {...getInputProps({
               onChange: handleChange,
               onKeyDown: (event) => {
